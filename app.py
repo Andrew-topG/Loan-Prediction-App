@@ -1,27 +1,16 @@
-import sys
-import subprocess
-
+from flask import Flask, request, render_template
+import numpy as np
+import pickle
+from sklearn.ensemble import RandomForestClassifier 
+import requests
 # Suppress scikit-learn version mismatch warning
 import warnings
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 
-# Ensure required libraries are installed
-required_packages = ['flask', 'numpy', 'pandas', 'sklearn']
-for pkg in required_packages:
-    try:
-        __import__(pkg if pkg != 'sklearn' else 'sklearn.ensemble')  # sklearn is a package, need to import a submodule
-    except ImportError:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
-
-from flask import Flask, request, render_template
-import numpy as np
-import pickle
-from sklearn.ensemble import RandomForestClassifier 
 
 
 
-import requests
 
 def load_model_from_url(url):
     response = requests.get(url)
