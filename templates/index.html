@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Default Prediction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Loan Default Prediction Form</h2>
+        <form action="/predict" method="post">
+
+            <!-- Monthly Inputs -->
+            <label>Monthly Income:</label>
+            <input type="number" name="month_income" required><br>
+
+            <label>Monthly Debt:</label>
+            <input type="number" name="debt" step="0.01" required><br>
+
+            <label>FICO Score:</label>
+            <input type="number" name="fico_range" required><br>
+
+            <label>Interest Rate (%):</label>
+            <input type="number" name="int_rate" min="0" max="25" step="0.01" required><br>
+
+            <label>Loan Amount:</label>
+            <input type="number" name="loan_amnt" required><br>
+
+            <label>Loan Term (months):</label>
+            <select name="term" required>
+                <option value="36">36</option>
+                <option value="60">60</option>
+            </select><br>
+
+            <label>Revolving Balance:</label>
+            <input type="number" name="revol_bal" required><br>
+
+            <label>Revolving Utilization (%):</label>
+            <input type="number" name="revol_util" step="0.1" required><br>
+
+            <label>Open Accounts:</label>
+            <input type="number" name="open_acc" required><br>
+
+            <label>Public Record Bankruptcies:</label>
+            <input type="number" name="pub_rec_bankruptcies" required><br>
+
+            <!-- Categorical Fields -->
+            <label>Application Type:</label>
+            <select name="application_type" required>
+                <option value="Individual">Individual</option>
+                <option value="Joint App">Joint App</option>
+            </select><br>
+
+            <label>Home Ownership:</label>
+            <select name="home_ownership" required>
+                <option value="RENT">RENT</option>
+                <option value="OWN">OWN</option>
+                <option value="MORTGAGE">MORTGAGE</option>
+            </select><br>
+
+            <label>Loan Purpose (Title):</label>
+            <select name="title" required>
+                <option value="Debt consolidation">Debt consolidation</option>
+                <option value="Other">Other</option>
+                <option value="Credit card refinancing">Credit card refinancing</option>
+                <option value="Home improvement">Home improvement</option>
+                <option value="Car financing">Car financing</option>
+                <option value="Major purchase">Major purchase</option>
+                <option value="Business">Business</option>
+                <option value="Home buying">Home buying</option>
+                <option value="Moving and relocation">Moving and relocation</option>
+                <option value="Vacation">Vacation</option>
+                <option value="Medical expenses">Medical expenses</option>
+                <option value="Green loan">Green loan</option>
+            </select><br>
+
+            <label>Verification Status:</label>
+            <select name="verification_status" required>
+                <option value="Verified">Verified</option>
+                <option value="Not Verified">Not Verified</option>
+            </select><br>
+
+            <input type="submit" value="Predict">
+        </form>
+    </div>
+</body>
+</html>
