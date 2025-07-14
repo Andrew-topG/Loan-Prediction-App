@@ -3,6 +3,8 @@ import numpy as np
 import pickle
 from sklearn.ensemble import RandomForestClassifier 
 import requests
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 
 app = Flask(__name__)
 
@@ -119,7 +121,7 @@ def predict():
         prob_default = probabilities[1]  # class '1' is usually "default"
         print(int(prob_default*100),"% Default")
 
-        Risk = Risk_cat[int(prob_default*2.5)+1]
+        Risk = Risk_cat[int(prob_default*2)+1]
 
         return f"""
         <h3> This is your predicted score </h3> \n
