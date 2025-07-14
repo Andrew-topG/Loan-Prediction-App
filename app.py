@@ -1,49 +1,45 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template,redirect, url_for
 import numpy as np
 import pickle
 from sklearn.ensemble import RandomForestClassifier 
 import requests
-# Suppress scikit-learn version mismatch warning
-import warnings
-from sklearn.exceptions import InconsistentVersionWarning
-warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
-
-
-
-
-
-def load_model_from_url(url):
-    response = requests.get(url)
-    response.raise_for_status()  # Raise if download failed
-    return pickle.loads(response.content)
-
-# Example usage
-model_url = "https://www.dropbox.com/scl/fi/qxtyk2obxs8gn1kq5dse6/model_rft.pkl?rlkey=s085ulecnnjzrmhpyvsqgzol4&st=s5hdb0kq&dl=1"
-model = load_model_from_url(model_url)
-
-
 
 app = Flask(__name__)
-#model = pickle.load(open("model_rft.pkl", "rb"))
 
-print("✅ Model loaded from Dropbox.")
+# Load model from URL if local load fails
+def load_model_from_url(url):
+    response = requests.get(url)
+    response.raise_for_status()  # Raise an error if download fails
+    return pickle.loads(response.content)
 
-# --- Assign Grade Based on Interest Rate ---
+try:
+    # Try loading from local file
+    with open("model_rft.pkl", "rb") as rf:
+        model = pickle.load(rf)
+    print("✅ Model loaded")
+except Exception as e:
+    print(f"⚠️ Local model load failed: {e}")
+    print("⏬ Trying to load model from DropBox")
+    model_url = "https://www.dropbox.com/scl/fi/qxtyk2obxs8gn1kq5dse6/model_rft.pkl?rlkey=s085ulecnnjzrmhpyvsqgzol4&st=s5hdb0kq&dl=1"
+    model = load_model_from_url(model_url)
+    print("✅ Model loaded from remote source.")
+
+
+
+# model = pickle.load(open("model_rft.pkl", "rb"))
+
+
+#Risk Category 
+Risk_cat = ["Very low","Low","Moderate","High","Very High"]
+
+    
+# Grade assignment based on interest rate using array
+grade_array = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+
 def assign_grade(int_rate):
-    if int_rate < 7.5:
-        return 'A'
-    elif int_rate < 10:
-        return 'B'
-    elif int_rate < 12.5:
-        return 'C'
-    elif int_rate < 15:
-        return 'D'
-    elif int_rate < 17.5:
-        return 'E'
-    elif int_rate < 20:
-        return 'F'
-    else:
-        return 'G'
+    index = int((int_rate - 6) / 2.5)
+    index = max(0, min(index, len(grade_array) - 1))  # Clamp to 0–6
+    return grade_array[index]
 
 # --- Derived Calculations ---
 def calculate_fields(income, debt, loan_amt, int_rate, term):
@@ -78,6 +74,7 @@ def predict():
         # Derived fields
         annual_inc, dti, installment = calculate_fields(income, debt, loan_amt, int_rate, term)
         grade = assign_grade(int_rate)
+        print("grade: ",grade)
 
         # Categorical inputs
         app_type = request.form['application_type']
@@ -112,7 +109,7 @@ def predict():
             verification_verified
         ], dtype=np.float32).reshape(1, -1)
 
-        print(final_input)
+        #print(final_input)
         prediction = model.predict(final_input)[0]
         result = "Loan Default" if prediction == 1 else "No Default"
 
@@ -120,11 +117,22 @@ def predict():
         probabilities = model.predict_proba(final_input)[0]  # Get first (and only) row
         # Extract default probability
         prob_default = probabilities[1]  # class '1' is usually "default"
+        print(int(prob_default*100),"% Default")
 
-        return f"<h3> This is your predicted score </h3> \n<h2>Prediction Result: {result}</h2> \n <h2>Probability of Default: {prob_default:.2%}</h2>"
+        Risk = Risk_cat[int(prob_default*2.5)+1]
+
+        return f"""
+        <h3> This is your predicted score </h3> \n
+          <h2>Prediction Result: {result}</h2> \n 
+          <h2>Probability of Default: {prob_default:.2%}</h2> \n 
+          <h2>Risk Category: {Risk}</h2>\n
+          <form action="/" method="get">
+            <button type="submit"><h2>🏠 Home</h2></button>
+        </form>
+        """
 
     except Exception as e:
         return f"<h3>Error: {str(e)}</h3>"
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=80,debug=True)
