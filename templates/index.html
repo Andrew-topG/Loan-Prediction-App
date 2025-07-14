@@ -14,13 +14,13 @@
             <input type="number" name="month_income" required><br>
 
             <label>Monthly Debt:</label>
-            <input type="number" name="debt" step="0.01" required><br>
+            <input type="number" name="debt" step="0.1" required><br>
 
             <label>FICO Score:</label>
-            <input type="number" name="fico_range" required><br>
+            <input type="number" name="fico_range" min="300" max="850" step="1" required><br>
 
             <label>Interest Rate (%):</label>
-            <input type="number" name="int_rate" min="0" max="25" step="0.01" required><br>
+            <input type="number" name="int_rate" min="6" max="30" step="0.01" required><br>
 
             <label>Loan Amount:</label>
             <input type="number" name="loan_amnt" required><br>
@@ -35,7 +35,7 @@
             <input type="number" name="revol_bal" required><br>
 
             <label>Revolving Utilization (%):</label>
-            <input type="number" name="revol_util" step="0.1" required><br>
+            <input type="number" name="revol_util" min="0" max="100" step="1" required><br>
 
             <label>Open Accounts:</label>
             <input type="number" name="open_acc" required><br>
