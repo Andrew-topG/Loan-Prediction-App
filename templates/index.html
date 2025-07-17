@@ -1,86 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loan Default Prediction</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <h2>Loan Default Prediction Form</h2>
-        <form action="/predict" method="post">
+    <main>
+        <div class="container">
+            <header>
+                <h1>Loan Default Prediction</h1>
+                <p>Please fill out the form below to assess your loan application.</p>
+                <div class="header-info">
+                    <span>Made with ❤</span>
+                    <span>Affiliated to Qapla IT Services</span>
+                </div>
+            </header>
 
-            <!-- Monthly Inputs -->
-            <label>Monthly Income:</label>
-            <input type="number" name="month_income" required><br>
+            <form action="/predict" method="post">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="month_income">Monthly Income</label>
+                        <input type="number" id="month_income" name="month_income" placeholder="e.g., 5000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="debt">Monthly Debt</label>
+                        <input type="number" id="debt" name="debt" step="0.1" placeholder="e.g., 500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fico_range">FICO Score</label>
+                        <input type="number" id="fico_range" name="fico_range" min="300" max="850" step="1" placeholder="e.g., 700" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loan_amnt">Loan Amount</label>
+                        <input type="number" id="loan_amnt" name="loan_amnt" placeholder="e.g., 10000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="revol_bal">Revolving Balance</label>
+                        <input type="number" id="revol_bal" name="revol_bal" placeholder="e.g., 8000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="revol_util">Revolving Utilization (%)</label>
+                        <input type="number" id="revol_util" name="revol_util" step="0.1" placeholder="e.g., 45.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="open_acc">Open Accounts</label>
+                        <input type="number" id="open_acc" name="open_acc" placeholder="e.g., 10" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pub_rec_bankruptcies">Public Record Bankruptcies</label>
+                        <input type="number" id="pub_rec_bankruptcies" name="pub_rec_bankruptcies" placeholder="e.g., 0" required>
+                    </div>
 
-            <label>Monthly Debt:</label>
-            <input type="number" name="debt" step="0.1" required><br>
+                    <div class="form-group">
+                        <label for="int_rate">Interest Rate (%): <span id="int_rate_value">18.00</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="int_rate_slider" name="int_rate_slider" min="6" max="30" step="0.01" value="18.00">
+                            <input type="number" id="int_rate" name="int_rate" min="6" max="30" step="0.01" value="18.00" required>
+                        </div>
+                    </div>
 
-            <label>FICO Score:</label>
-            <input type="number" name="fico_range" min="300" max="850" step="1" required><br>
+                    <div class="form-group">
+                        <label for="term">Loan Term (months)</label>
+                        <select id="term" name="term" required>
+                            <option value="36">36</option>
+                            <option value="60">60</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="application_type">Application Type</label>
+                        <select id="application_type" name="application_type" required>
+                            <option value="Individual">Individual</option>
+                            <option value="Joint App">Joint App</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="home_ownership">Home Ownership</label>
+                        <select id="home_ownership" name="home_ownership" required>
+                            <option value="RENT">Rent</option>
+                            <option value="OWN">Own</option>
+                            <option value="MORTGAGE">Mortgage</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Loan Purpose</label>
+                        <select id="title" name="title" required>
+                            <option value="Debt consolidation">Debt consolidation</option>
+                            <option value="Credit card refinancing">Credit card refinancing</option>
+                            <option value="Home improvement">Home improvement</option>
+                            <option value="Other">Other</option>
+                            <option value="Car financing">Car financing</option>
+                            <option value="Major purchase">Major purchase</option>
+                            <option value="Business">Business</option>
+                            <option value="Home buying">Home buying</option>
+                            <option value="Moving and relocation">Moving and relocation</option>
+                            <option value="Vacation">Vacation</option>
+                            <option value="Medical expenses">Medical expenses</option>
+                            <option value="Green loan">Green loan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="verification_status">Verification Status</label>
+                        <select id="verification_status" name="verification_status" required>
+                            <option value="Verified">Verified</option>
+                            <option value="Not Verified">Not Verified</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Predict</button>
+            </form>
+        </div>
+    </main>
 
-            <label>Interest Rate (%):</label>
-            <input type="number" name="int_rate" min="6" max="30" step="0.01" required><br>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const intRateSlider = document.getElementById('int_rate_slider');
+            const intRateInput = document.getElementById('int_rate');
+            const intRateValue = document.getElementById('int_rate_value');
 
-            <label>Loan Amount:</label>
-            <input type="number" name="loan_amnt" required><br>
+            function updateInterestRate(value) {
+                const formattedValue = parseFloat(value).toFixed(2);
+                intRateInput.value = formattedValue;
+                intRateSlider.value = formattedValue;
+                intRateValue.textContent = formattedValue;
+            }
 
-            <label>Loan Term (months):</label>
-            <select name="term" required>
-                <option value="36">36</option>
-                <option value="60">60</option>
-            </select><br>
+            intRateSlider.addEventListener('input', () => {
+                updateInterestRate(intRateSlider.value);
+            });
 
-            <label>Revolving Balance:</label>
-            <input type="number" name="revol_bal" required><br>
-
-            <label>Revolving Utilization (%):</label>
-            <input type="number" name="revol_util" min="0" max="100" step="1" required><br>
-
-            <label>Open Accounts:</label>
-            <input type="number" name="open_acc" required><br>
-
-            <label>Public Record Bankruptcies:</label>
-            <input type="number" name="pub_rec_bankruptcies" required><br>
-
-            <!-- Categorical Fields -->
-            <label>Application Type:</label>
-            <select name="application_type" required>
-                <option value="Individual">Individual</option>
-                <option value="Joint App">Joint App</option>
-            </select><br>
-
-            <label>Home Ownership:</label>
-            <select name="home_ownership" required>
-                <option value="RENT">RENT</option>
-                <option value="OWN">OWN</option>
-                <option value="MORTGAGE">MORTGAGE</option>
-            </select><br>
-
-            <label>Loan Purpose (Title):</label>
-            <select name="title" required>
-                <option value="Debt consolidation">Debt consolidation</option>
-                <option value="Other">Other</option>
-                <option value="Credit card refinancing">Credit card refinancing</option>
-                <option value="Home improvement">Home improvement</option>
-                <option value="Car financing">Car financing</option>
-                <option value="Major purchase">Major purchase</option>
-                <option value="Business">Business</option>
-                <option value="Home buying">Home buying</option>
-                <option value="Moving and relocation">Moving and relocation</option>
-                <option value="Vacation">Vacation</option>
-                <option value="Medical expenses">Medical expenses</option>
-                <option value="Green loan">Green loan</option>
-            </select><br>
-
-            <label>Verification Status:</label>
-            <select name="verification_status" required>
-                <option value="Verified">Verified</option>
-                <option value="Not Verified">Not Verified</option>
-            </select><br>
-
-            <input type="submit" value="Predict">
-        </form>
-    </div>
+            intRateInput.addEventListener('input', () => {
+                updateInterestRate(intRateInput.value);
+            });
+        });
+    </script>
 </body>
 </html>
